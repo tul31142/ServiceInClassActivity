@@ -1,5 +1,7 @@
 package edu.temple.myapplication
 
+import android.R.drawable.ic_media_pause
+import android.R.drawable.ic_media_play
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
@@ -93,12 +95,14 @@ class MainActivity : AppCompatActivity() {
             R.id.action_start ->
                 if (isConnected && !timerBinder.isRunning){
                     timerBinder.start(30)
+                    item.setIcon(ic_media_pause)
 //                findViewById<Button>(R.id.startButton).text = "Paused"
 
 
                 }
                 else if (isConnected && timerBinder.isRunning){
                     timerBinder.pause()
+                    item.setIcon(ic_media_play)
 //                findViewById<Button>(R.id.startButton).text = "Un-Paused"
 
                 }
