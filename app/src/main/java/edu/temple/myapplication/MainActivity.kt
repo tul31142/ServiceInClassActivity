@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
 import android.os.Looper
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.TextView
 import java.util.Timer
@@ -16,7 +18,7 @@ import kotlin.concurrent.timer
 class MainActivity : AppCompatActivity() {
 
     //Interact with the Timer
-    //
+    
 
     lateinit var timerBinder: TimerService.TimerBinder
     var isConnected = false
@@ -56,33 +58,53 @@ class MainActivity : AppCompatActivity() {
             serviceConnection,
             BIND_AUTO_CREATE
         )
+//
+//        findViewById<Button>(R.id.startButton).setOnClickListener {
+//
+//
+//
+//
+//        }
+//        //bind and unbind a service
+//        findViewById<Button>(R.id.stopButton).setOnClickListener {
+//
+//
+//        }
+    }
 
-        findViewById<Button>(R.id.startButton).setOnClickListener {
-            if (isConnected && !timerBinder.isRunning){
-                timerBinder.start(30)
-                findViewById<Button>(R.id.startButton).text = "Paused"
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean{
+
+        menuInflater.inflate(R.menu.main, menu)
+
+        return super.onCreateOptionsMenu(menu)
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when(item.itemId){
+            R.id.action_pause ->
+                if(isConnected){
+                    timerBinder.stop()
+                    textView.text  = "0"
+                }
 
 
-            }
-            else if (isConnected && timerBinder.isRunning){
-                timerBinder.pause()
-                findViewById<Button>(R.id.startButton).text = "Un-Paused"
+            R.id.action_start ->
+                if (isConnected && !timerBinder.isRunning){
+                    timerBinder.start(30)
+//                findViewById<Button>(R.id.startButton).text = "Paused"
 
-            }
 
+                }
+                else if (isConnected && timerBinder.isRunning){
+                    timerBinder.pause()
+//                findViewById<Button>(R.id.startButton).text = "Un-Paused"
+
+                }
 
 
         }
-        //bind and unbind a service
-        findViewById<Button>(R.id.stopButton).setOnClickListener {
-            if(isConnected){
-                timerBinder.stop()
-                textView.text = "0"
-                findViewById<Button>(R.id.startButton).text = "Start"
-
-
-            }
-
-        }
+        return super.onOptionsItemSelected(item)
     }
 }
