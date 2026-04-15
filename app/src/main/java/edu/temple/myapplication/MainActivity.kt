@@ -1,5 +1,6 @@
 package edu.temple.myapplication
 
+import android.R.attr.defaultValue
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
@@ -21,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var timerBinder: TimerService.TimerBinder
     var isConnected = false
     lateinit var textView: TextView
+
+    private val defaultValue = 30
 
     val serviceConnection = object : ServiceConnection{
         override fun onServiceConnected(
@@ -58,25 +61,27 @@ class MainActivity : AppCompatActivity() {
         )
 
         findViewById<Button>(R.id.startButton).setOnClickListener {
-            if (isConnected && !timerBinder.isRunning){
-                timerBinder.start(30)
-                findViewById<Button>(R.id.startButton).text = "Paused"
-
-
-            }
-            else if (isConnected && timerBinder.isRunning){
-                timerBinder.pause()
-                findViewById<Button>(R.id.startButton).text = "Un-Paused"
-
+            val savedValue = timerBinder?.getSavedValue() ?: -1
+            val startValue = if (savedValue != -1) savedValue else defaultValue
+                timerBinder?.start(startValue)
             }
 
+//            if (isConnected && !timerBinder.){
+//                timerBinder.start(30)
+//                findViewById<Button>(R.id.startButton).text = "Paused"
+//
+//
+//            }
+//            else if (isConnected && timerBinder.isRunning){
+//                timerBinder.pause()
+//                findViewById<Button>(R.id.startButton).text = "Un-Paused"
+//
+//            }
 
-
-        }
         //bind and unbind a service
         findViewById<Button>(R.id.stopButton).setOnClickListener {
             if(isConnected){
-                timerBinder.stop()
+                timerBinder?.stop()
                 textView.text = "0"
                 findViewById<Button>(R.id.startButton).text = "Start"
 
@@ -84,5 +89,22 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+    }
+
+    override fun onStart(){
+        super.onStart()
+        bindService(
+            Intent(this, TimerService::class.java), serviceConnection, BIND_AUTO_CREATE)
+
+    }
+
+    override fun onStop(){
+        super.onStop()
+        if(isConnected)
+        {
+            unbindService(serviceConnection)
+        }
+        isConnected = false
+
     }
 }
